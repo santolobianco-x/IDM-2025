@@ -1,0 +1,11 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
+
+# File grandi da escludere
+*.csv
+*.pdf
+
