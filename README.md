@@ -38,11 +38,47 @@ Seguendo l'ordine di utilizzo delle varie classi descriviamo i file e il loro co
    * **timetorange** (static method) suddivide la giornata in tre fasce orarie (**SLOT 1**, **SLOT 2**, **SLOT 3**) in base all'orario dell'acquisto;
    * **createslices** crea due feature derivate:
      - **fascia_mese**, ottenuta applicando *monthtorange*;
-     - **fascia_oraria**, ottenuta applicando *timetorange*
+     - **fascia_oraria**, ottenuta applicando *timetorange*;
    * **getdataset** restituisce il dataset preprocessato pronto per le successive fasi di analisi.
 
 
 
 ### 3 frequencyanalisys.py
+- Import utilizzate: **pandas**, **pyplot(from matplotlib)**
+- Classe: **FrequencyAnalizer**
+- Metodi della classe:
+  * **__init__** costruttore della classe, utilizzato per inizializzare l'attributo **dataset** e conservare una copia all'interno dell'oggetto, in modo da lavorare su una copia del dataset;
+  * **printplot (staticmethod)** metodo che accetta come parametri due **series** (5 elementi più frequenti e 5 elementi meno frequenti) e due **stringhe**(saranno utilizzate come titoli dei grafici). Sulla base delle **series** costruisce dei **barplot**;
+  * **analyze** metodo utilizzato per calcolare la frequenza degli elementi nel dataset e per richiamare **printplot**.  Il metodo può essere invocato più volte per analizzare i diversi livelli gerarchici presenti nel dataset. **NB**: il metodo accetta delle stringhe in input al fine di poter essere riutilizzato sia per l’analisi complessiva sia per quella stratificata;
+  * **analyzelevels** metodo che richiama **analyze** e passa come parametri due stringhe(titoli dei grafici);
+  * **stratifiedlevels** metodo che istanzia un oggetto **FrequencyAnalyzer** e passa i subset per l'analisi stratificata. Sono presenti due costrutti **for** che permettono di partizionare il dataset in base alle variabili **month_range** e **time_slot**.
 
 
+
+### 4 association.py
+- Import utilizzate: **pandas**, **TransactionEncoder (from mlxtend.preprocessing)**, **apriori(from mlxtend.frequent_patterns), association_rules(from mlxtend.frequent_patterns), fpgrowth (from mlxtend.frequent_patterns)**
+- Classe; **Association**
+- Metodi della classe:
+  * **__init__** costruttore della classe, utilizzato per inizializzare l'attributo **dataset** e conservarne una copia all'interno dell'oggetto. Vengono inoltre inizializzati gli attributi **transactions** e **rules**, che conterranno transazioni e regole di associazione;
+  * **create_transaction** metodo che costruisce l'insieme delle transazioni a partire da dataset. Gli articoli rappresentati mediante la variabile *descr_liv4* vengono raggruppati per **scontrino_id**, ottenendo una lista di prodotti per ciascuna transazione;
+  * **apriorirules** applica l'algoritmo **Apriori** per l'estrazione degli itemset frequenti e delle regole di associazione. Le transazini vengono prima trasformate in una rappresentazione binaria tramite **TransactionEncoder**. Successivamente vengono estratti gli itemset frequenti con una soglia **threshold** e imponendo una soglia minima di confidenza **confidence**;
+  * **fpgrowthrules** applica l’algoritmo **FP-Growth** per l’estrazione degli itemset frequenti. Anche in questo caso, le regole di associazione vengono calcolate imponendo una soglia minima di **confidence**;
+  * **showrules**: metodo che stampa a schermo le prime **n** regole di associazione estratte, mostrando per ciascuna regola gli attributi principali:  
+    **antecedents**, **consequents**, **support**, **confidence** e **lift**.
+
+### 5 clustering.py
+- Import utilizzate: **pandas**, **PCA(frm sklearn.decomposition)**,**KMeans (from sklearn.cluster)**, **silhouette_score (from sklearn.metrics)**
+- Classe: **Clustering**
+- Metodi della classe:
+  * **__init__**: costruttore della classe, utilizzato per inizializzare l’attributo **dataset** e conservarne una copia all’interno dell’oggetto. Vengono inoltre inizializzati gli attributi **matrix**, **matrixreduced** e **clusters**.
+  * **preparematrix**: metodo che filtra il dataset mantenendo esclusivamente le righe in cui il campo **tessera** non è nullo.Successivamente costruisce una matrice in cui:
+    - le righe rappresentano le **tessere**,
+    - le colonne rappresentano i **prodotti (descr_liv4)**,
+      
+  * **reducedimensionality**: metodo che applica la **PCA** alla matrice per ridurne la dimensionalità. Il numero di componenti principali è specificato tramite il parametro **components**;
+  * **elbow (staticmethod)**: metodo che implementa il **metodo del gomito** per la selezione del numero ottimale di cluster. Il metodo restituisce la variazione dell’inerzia tra cluster consecutivi;
+  * **silhouette (staticmethod)**: metodo che calcola il **Silhouette Score** per diversi valori di *k*.Il metodo restituisce un dizionario che associa a ciascun valore di *k* il relativo punteggio di silhouette;
+  * **clustering**: metodo che applica l’algoritmo **KMeans** sulla matrice a dimensionalità ridotta. Il numero di cluster può essere:
+    - selezionato automaticamente tramite **elbow**,
+    - selezionato automaticamente tramite **silhouette**,
+    - oppure impostato manualmente tramite il parametro **k**.
