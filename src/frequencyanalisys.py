@@ -17,14 +17,14 @@ class FrequencyAnalyzer:
         plt.xlabel("Element")
         plt.grid()
         plt.ylabel("Frequency")
-        plt.xticks(rotation=25)
+        plt.xticks(rotation=45)
 
         plt.subplot(1,2,2)
         least.plot(kind='bar',title=title2)
         plt.xlabel("Element")
         plt.ylabel("Frequency")
         plt.grid()
-        plt.xticks(rotation=25)
+        plt.xticks(rotation=45)
 
         plt.tight_layout()
         plt.show()

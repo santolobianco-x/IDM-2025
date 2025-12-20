@@ -10,7 +10,7 @@ class DataLoader:
         self.dataset = pd.read_csv(self.path)
         return self.dataset
     
-    def printfirst(self,occur):
+    def printfirst(self,occur = 5):
         if self.dataset is None:
             raise RuntimeError("Dataset non caricato.")
         print(self.dataset.head(occur))
