@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+.localized
+
+# Dati
+data/
+*.xlsx
+*.tsv
+*.csv
+
+# Documenti generici
+*.pdf
+*.doc
+*.docx
+
+# Cartelle da ignorare
+slides/
+
+# Eccezioni
+!classworks/first_classwork/description.pdf
+!classworks/first_classwork/FirstClasswork.pdf
+!classworks/second_classwork/SecondClasswork.pdf
+!project/ConsegnaProgetto.pdf
+
