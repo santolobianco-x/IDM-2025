@@ -49,6 +49,7 @@ y = dfconcatenated['class']
 pca = PCAVisualizer(2)
 Xpca = pca.reduce(X)
 pca.plot(Xpca,y)
+print(f"Explained variance ratio: {pca.explainvariance()}")
 
 
 

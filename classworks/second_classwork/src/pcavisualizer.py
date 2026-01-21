@@ -1,7 +1,9 @@
 import pandas as pd
+import seaborn as sns
+from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from matplotlib import pyplot as plt
+
 
 class PCAVisualizer: 
 
@@ -16,14 +18,27 @@ class PCAVisualizer:
         return datareduced
     
     def plot(self, Xpca, y, title = "PCA 2D"):
+        plot = pd.DataFrame({
+            "PC1": Xpca[:,0],
+            "PC2": Xpca[:,1],
+            "class": y.values
+        })
         plt.figure(figsize=(8,6))
-        classes = y.unique()
-        for c in classes:
-            idx = y == c
-            plt.scatter(Xpca[idx,0], Xpca[idx,1], label = c, alpha=0.7)
-        plt.xlabel("PC1")
-        plt.ylabel("PC2")
-        plt.title(title)
-        plt.grid()
+        sns.scatterplot(
+            data=plot, 
+            x="PC1", 
+            y= "PC2", 
+            hue="class", 
+            alpha = 0.85,
+            s= 40,
+            edgecolor = "black",
+            linewidth = 0.9)
+        plt.title(title, fontsize=14, fontweight="bold") 
+        plt.xlabel("PC1", fontsize=12) 
+        plt.ylabel("PC2", fontsize=12) 
+        plt.tight_layout() 
         plt.show()
-        
+
+
+    def explainvariance(self):
+        return self.pca.explained_variance_ratio_

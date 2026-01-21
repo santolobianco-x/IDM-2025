@@ -21,19 +21,19 @@ class Model:
 
     def _buildmodel(self):
         if self.modelname == "decisiontree":
-            self.pipeline = Pipeline(
-                [("clf",
-                 DecisionTreeClassifier(random_state=self.random_state)
-                 )])
+            self.pipeline = Pipeline([
+                ("scaler", StandardScaler()),
+                ("clf",DecisionTreeClassifier(random_state=self.random_state))
+                ])
             self.paramgrid = {
                 "clf__max_depth": [None, 5, 10, 20],
                 "clf__min_samples_split": [2, 5, 10]
             }
         elif self.modelname == "randomforest":
-            self.pipeline = Pipeline([(
-                "clf",
-                RandomForestClassifier(random_state=self.random_state)
-                )])
+            self.pipeline = Pipeline([
+                ("scaler", StandardScaler()),
+                ("clf",RandomForestClassifier(random_state=self.random_state))
+                ])
             self.paramgrid = {
                 "clf__n_estimators" : [50,100],
                 "clf__max_depth" : [None, 10, 20]
@@ -98,16 +98,6 @@ def boosting_decisiontree(Xtrain, ytrain, Xtest, ytest):
     ada.fit(Xtrain,ytrain)
     return ada.score(Xtest,ytest)
 
-
-def bagging_knn(Xtrain, ytrain, Xtest, ytest):
-    bagg = BaggingClassifier(
-        estimator= KNeighborsClassifier(n_neighbors=5),
-        n_estimators= 50,
-        max_samples = 0.8,
-        random_state = 42 
-    )
-    bagg.fit(Xtrain,ytrain)
-    return bagg.score(Xtest, ytest)
 
 def bagging_knn(Xtrain, ytrain, Xtest, ytest):
     bagg = BaggingClassifier(
