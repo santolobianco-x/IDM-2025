@@ -8,19 +8,20 @@ class Dataset:
         self.processed_path = processed_path
         self.df = None
 
-    def prepare(self, mapper):
+    def prepare(self, mapper, preprocessor):
         if os.path.exists(self.processed_path):
             print(f"Processed dataset found: {self.processed_path}")
             self.df = pd.read_csv(self.processed_path, sep="\t", index_col=0)
         elif os.path.exists(self.raw_path):
             print(f"Dataset processed not found, generating: {self.processed_path}")
-            self._generate_processed(mapper)
+            self._generate_processed(mapper, preprocessor)
         else:
             raise FileNotFoundError(f"File raw not found: {self.raw_path}")
         
         return pd.DataFrame(self.df)
         
-    def _generate_processed(self, mapper):
+
+    def _generate_processed(self, mapper, preprocessor):
         self.df = pd.read_csv(self.raw_path, sep="\t")
         self.df = self.df.set_index("Ensembl_ID")
 
@@ -32,6 +33,11 @@ class Dataset:
 
 
         self.df = self.df[~self.df.index.duplicated(keep="first")]
+
+        self.df = preprocessor.preprocess(self.df)
+
+
+        self.df = self.df.astype('float32')
 
         self.df.to_csv(self.processed_path, sep="\t")
 
