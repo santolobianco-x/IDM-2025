@@ -1,11 +1,10 @@
 from dataset import Dataset
 from mapper import Mapper
 from preprocessing import Preprocessor
-from correlation import Correlation 
+from correlation import Correlation
 from pathmanager import PathManager
 from pca import PCA_reducer
 from autoencoder_reducer import Autoencoder_Reducer
-import pandas as pd
 
 
 tumors = ["TCGA-BRCA","TCGA-COAD","TCGA-LUAD", "TCGA-OV", "TCGA-PAAD", "TCGA-PRAD"]
@@ -39,7 +38,7 @@ if len(tumors) == 0:
     exit(1)
 
 
-dataset_ae = {}
+datasets_ae = {}
 aefiles = pathm.reducedfiles_ae(tumors)
 for (t,file) in zip(tumors,aefiles):
     ae = Autoencoder_Reducer(path=file, 
@@ -47,10 +46,10 @@ for (t,file) in zip(tumors,aefiles):
                              encoding_dim=50, 
                              epochs=20, 
                              batch_size=32)
-    dataset_ae[t] = ae.getMatrixReduced()
+    datasets_ae[t] = ae.getMatrixReduced()
+
+
 datasets_pca = {}
-
-
 pcafiles = pathm.reducefiles_pca(tumors)
 
 for (t,file) in zip(tumors, pcafiles):
@@ -58,27 +57,35 @@ for (t,file) in zip(tumors, pcafiles):
     datasets_pca[t] = pca.getMatrixReduced()
 
 
-
-
-"""
 threshold = 0.90
+
+
 corrfiles = pathm.correlationfiles(tumors,threshold=threshold)
+corrdata = {}
 
-for t, outputfile in zip(tumors, corrfiles):
-    try:
-        correlator = Correlation(datasets[t])
-        correlator.chunked_correlation(output_path=outputfile,chunk_size=1500,threshold=threshold)
-    except FileExistsError as e:
-        print(e)
-"""
+for t,file in zip(tumors,corrfiles):
+    correlator = Correlation(datasets[t])
+    corrdata[t] = correlator.getCorrelationMatrix(output_path=file,chunk_size=1500,threshold=threshold)
 
+del datasets
 
 
+corrfilesae = pathm.correlationfilesae(tumors,threshold=threshold)
+corrdata_ae = {}
 
 
-"""
-df = datasets_pca[tumors[1]].head(10)
-df.to_csv(f"data/light.tsv", sep="\t")
-"""
+for t, file in zip(tumors, corrfilesae):
+    correlator = Correlation(datasets_ae[t].T)
+    corrdata_ae[t] = correlator.getCorrelationMatrix(output_path=file, chunk_size= 1500, threshold=threshold)
 
+del datasets_ae
+
+corrfilespca = pathm.correlationfilespca(tumors,threshold=threshold)
+corrdatapca = {}
+
+for t, file in zip(tumors, corrfilespca):
+    correlator = Correlation(datasets_pca[t].T)
+    corrdatapca[t] = correlator.getCorrelationMatrix(output_path=file, chunk_size= 1500, threshold=threshold)
+
+del datasets_pca
 

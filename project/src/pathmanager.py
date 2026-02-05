@@ -34,6 +34,12 @@ class PathManager:
     def correlationfile(self, tumor, threshold):
         return os.path.join(self.results_dir, f"{tumor}.correlation_{threshold}.tsv")
     
+    def correlationfilepca(self, tumor, threshold):
+        return os.path.join(self.results_dir, f"{tumor}.correlation.pca._{threshold}.tsv")
+    
+    def correlationfileae(self, tumor, threshold):
+        return os.path.join(self.results_dir, f"{tumor}.correlation.ae._{threshold}.tsv")
+    
     def rawfiles(self, tumors):
         return [self.rawfile(t) for t in tumors]
     
@@ -48,3 +54,9 @@ class PathManager:
     
     def correlationfiles(self, tumors, threshold):
         return [self.correlationfile(t,threshold) for t in tumors]
+    
+    def correlationfilespca(self, tumors, threshold):
+        return [self.correlationfilepca(t,threshold) for t in tumors]
+
+    def correlationfilesae(self, tumors, threshold):
+        return [self.correlationfileae(t,threshold) for t in tumors] 
