@@ -5,6 +5,7 @@ from correlation import Correlation
 from pathmanager import PathManager
 from pca import PCA_reducer
 from autoencoder_reducer import Autoencoder_Reducer
+from analysis import CorrelationAnalyzer
 
 
 tumors = ["TCGA-BRCA","TCGA-COAD","TCGA-LUAD", "TCGA-OV", "TCGA-PAAD", "TCGA-PRAD"]
@@ -57,7 +58,7 @@ for (t,file) in zip(tumors, pcafiles):
     datasets_pca[t] = pca.getMatrixReduced()
 
 
-threshold = 0.90
+threshold = 0.9
 
 
 corrfiles = pathm.correlationfiles(tumors,threshold=threshold)
@@ -81,11 +82,27 @@ for t, file in zip(tumors, corrfilesae):
 del datasets_ae
 
 corrfilespca = pathm.correlationfilespca(tumors,threshold=threshold)
-corrdatapca = {}
+corrdata_pca = {}
 
 for t, file in zip(tumors, corrfilespca):
     correlator = Correlation(datasets_pca[t].T)
-    corrdatapca[t] = correlator.getCorrelationMatrix(output_path=file, chunk_size= 1500, threshold=threshold)
+    corrdata_pca[t] = correlator.getCorrelationMatrix(output_path=file, chunk_size= 1500, threshold=threshold)
 
 del datasets_pca
 
+
+for t in tumors:
+    analyzer = CorrelationAnalyzer(tumor_name=t, 
+                                   df_raw=corrdata[t], 
+                                   df_ae=corrdata_ae[t], 
+                                   df_pca=corrdata_pca[t])
+    
+    # 1. Calcolo metriche numeriche (Jaccard)
+    analyzer.print_jaccard_overlap()
+    
+    # 2. Generazione Grafici
+    analyzer.plot_scatter()
+
+    # ! OPTIONAL !: Se la RAM è piena, puoi cancellare i df di questo tumore ora
+    # del corrdata[t], corrdata_ae[t], corrdatapca[t]
+    # gc.collect()

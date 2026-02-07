@@ -6,6 +6,7 @@ import gc
 class Correlation:
     def __init__(self, dataset):
         self.dataset = dataset
+        self.n_samples = dataset.shape[0]
  
     def getCorrelationMatrix(self, output_path, chunk_size=2000, threshold=None, overwrite=False):
         if os.path.exists(output_path) and not overwrite:
