@@ -15,7 +15,12 @@ class Autoencoder:
         self.encoding_dim = encoding_dim
 
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch.backends.mps.is_available():
+            self.device = torch.device("mps")
+        elif torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
 
 
         self.model = AENetwork(input_dim, encoding_dim).to(self.device)
@@ -31,7 +36,10 @@ class Autoencoder:
 
 
         dataset = TensorDataset(X_tensor, X_tensor)
-        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        dataloader = DataLoader(dataset, 
+                                batch_size=batch_size, 
+                                shuffle=True,
+                                num_workers=0)
 
         self.model.train()
         for epoch in range(epochs):
@@ -60,12 +68,3 @@ class Autoencoder:
             encoded = self.model.encode(X_tensor)
 
         return encoded.cpu().numpy()        
-
-
-
-
-
-
-
-
-

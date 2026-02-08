@@ -46,7 +46,7 @@ class PathManager:
     def processedfiles(self, tumors):
         return [self.processedfile(t) for t in tumors]
     
-    def reducefiles_pca(self, tumors):
+    def reducedfiles_pca(self, tumors):
         return [self.reducedfile_pca(t) for t in tumors]
     
     def reducedfiles_ae(self, tumors):
