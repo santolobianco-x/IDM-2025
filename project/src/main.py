@@ -37,6 +37,7 @@ for idx,t in enumerate(tumors):
     try:
         dataset = Dataset(raw_path=rawpaths[idx],processed_path=procpaths[idx])
         dataset = dataset.prepare(mapper,preproc)
+        print(f"Dimension of '{procpaths[idx]}': {dataset.shape}")
     except FileNotFoundError as e:
         print(f"{e}")
         continue
@@ -47,10 +48,12 @@ for idx,t in enumerate(tumors):
                              epochs=20,
                              batch_size=32)
     dataset_ae = ae.getMatrixReduced()
+    print(f"Dimension of '{aepath[idx]}: {dataset_ae.shape}'")
     pca = PCA_reducer(path=pcapath[idx],
                       dataset=dataset,
                       threshold= 0.9)
     dataset_pca = pca.getMatrixReduced()
+    print(f"Dimension of '{pcapath[idx]}: {dataset_pca.shape}'")
 
     correlator = Correlation(dataset=dataset)
     corrdata = correlator.getCorrelationMatrix(output_path=corrpath[idx],

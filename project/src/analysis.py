@@ -15,7 +15,7 @@ class CorrelationAnalyzer:
         self._prepare_data()
 
     def _prepare_data(self):
-        print(f"Indicizzazione coppie per {self.tumor}...")
+        print(f"Indexing gene pairs for {self.tumor}...")
         
         
         if self.corr is not None and not self.corr.empty:
@@ -38,7 +38,9 @@ class CorrelationAnalyzer:
 
         self._plot_scatter()
 
-        print(f"--- Analisi completata per {self.tumor} ---\n")
+        self._plot_hub_genes(top_n=5)
+
+        print(f"---Analysis completed for {self.tumor} ---\n")
 
     def _plot_distributions(self):
         plt.figure(figsize=(10, 6))
@@ -51,16 +53,17 @@ class CorrelationAnalyzer:
         if self.corr_pca is not None:
             sns.kdeplot(self.corr_pca['Correlation'].dropna(), label='PCA', fill=True, alpha=0.3, color='green')
         
-        plt.title(f"Distribuzione dei Coefficienti di Correlazione - {self.tumor}")
-        plt.xlabel("Coefficiente di Correlazione (Pearson)")
-        plt.ylabel("Densità")
+        plt.title(f"Distribution of Correlation Coefficients - {self.tumor}")
+        plt.xlabel("Correlation Coefficient (Pearson)")
+        plt.ylabel("Density")
         plt.legend()
-        plt.grid(alpha=0.3)
+        plt.xlim(-1, 1)
+        plt.grid(alpha=0.25)
         plt.show()
         
 
     def _analyze_method(self, df_target, method_name):
-        print(f"Confronto ORIGINALE vs {method_name}...")
+        print(f"Comparing RAW vs {method_name}...")
         set_raw = set(self.corr['pair'])
         set_target = set(df_target['pair'])
         
@@ -68,13 +71,13 @@ class CorrelationAnalyzer:
         union = len(set_raw.union(set_target))
         jaccard = intersection / union if union > 0 else 0
         
-        print(f"   -> Jaccard Index (Similarità Topologica): {jaccard:.4f}")
+        print(f" -> Jaccard Index (Topological Similarity): {jaccard:.4f}")
         
         
         merged = pd.merge(self.corr, df_target, on='pair', suffixes=('_raw', f'_{method_name}'))
         
         if merged.empty:
-            print(f"Attenzione: Nessuna coppia in comune trovata tra RAW e {method_name} (controllare le soglie).")
+            print(f"Warning: No common pairs found between RAW and {method_name} (check thresholds).")
             return
 
         x = merged['Correlation_raw']
@@ -93,7 +96,7 @@ class CorrelationAnalyzer:
         
         print(f"   -> RMSE: {rmse:.4f}")
         print(f"   -> Spearman Correlation: {sp_corr:.4f}")
-        print(f"   -> Coppie comuni analizzate: {len(merged)}")
+        print(f" -> Common pairs analyzed: {len(merged)}")
 
 
     def _plot_scatter(self):
@@ -133,6 +136,39 @@ class CorrelationAnalyzer:
 
             axes[1].set_title(f"RAW vs PCA (n={len(merged)})")
 
-        plt.suptitle(f"Analisi Correlazione: {self.tumor}")
+        plt.suptitle(f"Correlation Analysis: {self.tumor}")
         plt.tight_layout()
+        plt.show()
+
+    def _get_top_hubs(self, df, top_n=5):
+        if df is None or df.empty:
+            return pd.Series(dtype=int)
+        
+        all_genes = pd.concat([df['GeneA'], df['GeneB']])
+        return all_genes.value_counts().head(top_n)
+
+    def _plot_hub_genes(self, top_n=5):
+        
+        _, axes = plt.subplots(1, 3, figsize=(18, 6), sharey=False)
+        
+        
+        raw_hubs = self._get_top_hubs(self.corr, top_n)
+        sns.barplot(ax=axes[0], x=raw_hubs.values, y=raw_hubs.index, hue=raw_hubs.index, palette='Blues_r', legend=False)
+        axes[0].set_title(f"Top {top_n} Hubs - RAW")
+        axes[0].set_xlabel("Numero di Connessioni (>0.9)")
+
+        
+        ae_hubs = self._get_top_hubs(self.corr_ae, top_n)
+        sns.barplot(ax=axes[1], x=ae_hubs.values, y=ae_hubs.index, hue=ae_hubs.index, palette='Reds_r', legend=False)
+        axes[1].set_title(f"Top {top_n} Hubs - Autoencoder")
+        axes[1].set_xlabel("Numero di Connessioni (>0.9)")
+
+        
+        pca_hubs = self._get_top_hubs(self.corr_pca, top_n)
+        sns.barplot(ax=axes[2], x=pca_hubs.values, y=pca_hubs.index, hue=pca_hubs.index, palette='Greens_r', legend=False)
+        axes[2].set_title(f"Top {top_n} Hubs - PCA")
+        axes[2].set_xlabel("Numero di Connessioni (>0.9)")
+
+        plt.suptitle(f"Hub Gene Connectivity Analysis: {self.tumor}", fontsize=16)
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.show()
