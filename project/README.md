@@ -1,4 +1,4 @@
-# Progetto Data Mining - AUTOENCODER SU PROFILI DI ESPRESSIONE PER CALCOLO DELLE CORRELAZIONI TRA GENI.
+# Progetto Data Mining - Analisi delle correlazioni geniche tramite Autoencoder e PCA.
 
 ## Analisi delle Correlazioni Geniche tramite Autoencoder e PCA
 
@@ -56,7 +56,7 @@ Durante la stesura del codice si è seguito un approccio di **programmazione ori
 
 * **Classe:** `Dataset`
 * **Metodi:**
-* `prepare`: Verifica se esiste già una versione processata del dataset; in caso contrario, avvia la generazione tramite Mapper e Preprocessor.
+* `prepare`: Verifica se esiste già una versione processata del dataset; in caso contrario, avvia la generazione applicando le fasi di preprocessing e mapping.
 * `_generate_processed`: Gestisce il caricamento del file TSV, la rimozione delle versioni degli ID (suffissi post-punto) e la gestione dei duplicati.
 
 
@@ -76,7 +76,7 @@ Durante la stesura del codice si è seguito un approccio di **programmazione ori
 * **Descrizione:** Definisce l'architettura della rete neurale (Encoder/Decoder).
 * **Metodi:**
 * `fit`: Addestra la rete neurale per minimizzare l'errore di ricostruzione (MSELoss) utilizzando l'ottimizzatore Adam.
-* `encode` / `transform`: Estrae lo spazio latente (le **30 dimensioni** compresse) dal dataset originale.
+* `encode` / `transform`: Estrae lo spazio latente (le **30 dimensioni** compresse) dal dataset originale. A differenza della PCA, in cui il numero di componenti è determinato dalla varianza spiegata, l’Autoencoder utilizza una dimensionalità latente fissata a priori.
 
 
 
@@ -110,7 +110,7 @@ Durante la stesura del codice si è seguito un approccio di **programmazione ori
 * **`_prepare_data`**: metodo interno che si occupa dell'indicizzazione delle coppie di geni. Crea una colonna univoca **'pair'** (ottenuta concatenando *GeneA* e *GeneB*) per permettere il confronto diretto tra le diverse matrici tramite operazioni di merge;
 * **`run_full_analysis`**: orchestratore principale che esegue l'intera pipeline di analisi statistica e visualizzazione, richiamando in sequenza i metodi per i grafici di distribuzione, il calcolo delle metriche e l'analisi degli Hub Genes;
 * **`_plot_distributions`**: genera un grafico di densità (**KDE Plot**) per confrontare le distribuzioni dei coefficienti di correlazione delle tre matrici, permettendo di analizzare come i modelli ridotti distribuiscono i pesi rispetto ai dati originali;
-* **`_analyze_method`**: calcola e stampa a video le metriche quantitative di confronto:
+* **`_analyze_method`**: calcola e stampa a video le metriche quantitative di confronto: Jaccard Index, RMSE e Correlazione di Spearman.
 * **`_plot_scatter`**: costruisce grafici a dispersione (**Scatter Plot**) campionando 20.000 coppie per visualizzare la fedeltà dei singoli valori di correlazione rispetto alla matrice originale;
 * **`_get_top_hubs`**: metodo di supporto che identifica i geni con il maggior numero di connessioni elevate (>0.9), definendo i cosiddetti **Hub Genes** del network;
 * **`_plot_hub_genes`**: produce istogrammi comparativi dei primi 5 Hub Genes identificati in ciascuna matrice, evidenziando quali geni regolatori sono stati preservati o enfatizzati dalle tecniche di riduzione.
