@@ -8,14 +8,18 @@ from autoencoder_reducer import Autoencoder_Reducer
 from analysis import CorrelationAnalyzer
 
 
-
 tumors = ["TCGA-BRCA","TCGA-COAD","TCGA-LUAD", "TCGA-OV", "TCGA-PAAD", "TCGA-PRAD"]
+
+
 mapper = Mapper("gene_mapping.tsv")
 preproc = Preprocessor()
 
 
 pathm = PathManager()
-threshold = 0.9
+
+
+pos_thresh = 0.8
+neg_thresh = -0.5
 
 rawpaths = pathm.rawfiles(tumors)
 
@@ -26,9 +30,9 @@ pcapath = pathm.reducedfiles_pca(tumors)
 
 
 
-corrpath = pathm.correlationfiles(tumors,threshold=threshold)
-corrpath_ae = pathm.correlationfilesae(tumors,threshold=threshold)
-corrpath_pca = pathm.correlationfilespca(tumors,threshold=threshold)
+corrpath = pathm.correlationfiles(tumors)
+corrpath_ae = pathm.correlationfilesae(tumors)
+corrpath_pca = pathm.correlationfilespca(tumors)
 
 
 
@@ -44,8 +48,8 @@ for idx,t in enumerate(tumors):
 
     ae = Autoencoder_Reducer(path=aepath[idx],
                              dataset=dataset.T,
-                             encoding_dim=30,
-                             epochs=20,
+                             encoding_dim=45,
+                             epochs=25,
                              batch_size=32)
     dataset_ae = ae.getMatrixReduced()
     print(f"Dimension of '{aepath[idx]}: {dataset_ae.shape}'")
@@ -58,28 +62,37 @@ for idx,t in enumerate(tumors):
     correlator = Correlation(dataset=dataset)
     corrdata = correlator.getCorrelationMatrix(output_path=corrpath[idx],
                                                chunk_size=1500,
-                                               threshold=threshold,
+                                               pos_thresh=pos_thresh,
+                                               neg_thresh=neg_thresh,
                                                overwrite=False)
     
     correlator_ae = Correlation(dataset=dataset_ae.T)
     corrdata_ae = correlator_ae.getCorrelationMatrix(output_path=corrpath_ae[idx],
                                                      chunk_size=1500,
-                                                     threshold=threshold,
+                                                     pos_thresh=pos_thresh,
+                                                     neg_thresh=neg_thresh,
                                                      overwrite=False)
     
     correlator_pca = Correlation(dataset=dataset_pca.T)
     corrdata_pca = correlator_pca.getCorrelationMatrix(output_path=corrpath_pca[idx],
                                                        chunk_size=1500,
-                                                       threshold=threshold,
+                                                       pos_thresh=pos_thresh,
+                                                       neg_thresh=neg_thresh,
                                                        overwrite=False)
+    print()
+
     
-    analyzer = CorrelationAnalyzer(tumor_name= t,
+    del dataset_ae, dataset_pca
+    analyzer = CorrelationAnalyzer(tumor= t,
+                                   dataset= dataset,
                                    corr=corrdata,
                                    corr_ae=corrdata_ae,
-                                   corr_pca=corrdata_pca)
+                                   corr_pca=corrdata_pca,
+                                   epsilon=0.15)
     analyzer.run_full_analysis()
     print()
-    print()
-    del dataset, dataset_ae, dataset_pca, corrdata, corrdata_ae, corrdata_pca
+
+    del corrdata, corrdata_ae, corrdata_pca, dataset
+    
 
 

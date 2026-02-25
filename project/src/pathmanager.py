@@ -31,14 +31,14 @@ class PathManager:
     def reducedfile_ae(self,tumor):
         return os.path.join(self.autoencoder_dir,f"{tumor}.reduced_ae.tsv")
     
-    def correlationfile(self, tumor, threshold):
-        return os.path.join(self.results_dir, f"{tumor}.correlation_{threshold}.tsv")
+    def correlationfile(self, tumor):
+        return os.path.join(self.results_dir, f"{tumor}.correlation.tsv")
     
-    def correlationfilepca(self, tumor, threshold):
-        return os.path.join(self.results_dir, f"{tumor}.correlation.pca._{threshold}.tsv")
+    def correlationfilepca(self, tumor):
+        return os.path.join(self.results_dir, f"{tumor}.correlation.pca.tsv")
     
-    def correlationfileae(self, tumor, threshold):
-        return os.path.join(self.results_dir, f"{tumor}.correlation.ae._{threshold}.tsv")
+    def correlationfileae(self, tumor):
+        return os.path.join(self.results_dir, f"{tumor}.correlation.ae.tsv")
     
     def rawfiles(self, tumors):
         return [self.rawfile(t) for t in tumors]
@@ -52,11 +52,11 @@ class PathManager:
     def reducedfiles_ae(self, tumors):
         return [self.reducedfile_ae(t) for t in tumors]
     
-    def correlationfiles(self, tumors, threshold):
-        return [self.correlationfile(t,threshold) for t in tumors]
+    def correlationfiles(self, tumors):
+        return [self.correlationfile(t) for t in tumors]
     
-    def correlationfilespca(self, tumors, threshold):
-        return [self.correlationfilepca(t,threshold) for t in tumors]
+    def correlationfilespca(self, tumors):
+        return [self.correlationfilepca(t) for t in tumors]
 
-    def correlationfilesae(self, tumors, threshold):
-        return [self.correlationfileae(t,threshold) for t in tumors] 
+    def correlationfilesae(self, tumors):
+        return [self.correlationfileae(t) for t in tumors] 

@@ -8,7 +8,7 @@ class Correlation:
         self.dataset = dataset
         self.n_samples = dataset.shape[0]
  
-    def getCorrelationMatrix(self, output_path, chunk_size=2000, threshold=None, overwrite=False):
+    def getCorrelationMatrix(self, output_path, chunk_size=2000, pos_thresh=None, neg_thresh = None, overwrite=False):
         if os.path.exists(output_path) and not overwrite:
             print(f"Correlation matrix: {output_path}")
         else:
@@ -21,12 +21,12 @@ class Correlation:
                     
             else:
                 print(f"Correlation matrix not found, generating:{output_path}")
-            self.chunked_correlation(output_path,chunk_size, threshold)
+            self.chunked_correlation(output_path,chunk_size, pos_thresh, neg_thresh)
         return pd.read_csv(output_path,sep='\t')
 
     
         
-    def chunked_correlation(self, op, size=2000, threshold=None):    
+    def chunked_correlation(self, op, size=2000, pos_thresh=None, neg_thresh = None):    
         n_genes = self.dataset.shape[1]
         gene_names = self.dataset.columns.values
         
@@ -39,9 +39,10 @@ class Correlation:
             rawFirstBlock = self.dataset.iloc[:, i:i+size].values.T.astype(np.float32)
             firstCols = gene_names[i:i+size]
             
+
             
             mean_i = rawFirstBlock.mean(axis=1, keepdims=True)
-            std_i = rawFirstBlock.std(axis=1, keepdims=True)
+            std_i = rawFirstBlock.std(axis=1, keepdims=True, ddof = 1)
             std_i[std_i == 0] = 1e-9 
             firstBlock = (rawFirstBlock - mean_i) / std_i
             
@@ -56,7 +57,7 @@ class Correlation:
                 
                 
                 mean_j = rawSecondBlock.mean(axis=1, keepdims=True)
-                std_j = rawSecondBlock.std(axis=1, keepdims=True)
+                std_j = rawSecondBlock.std(axis=1, keepdims=True,  ddof = 1)
                 std_j[std_j == 0] = 1e-9
                 secondBlock = (rawSecondBlock - mean_j) / std_j
                 
@@ -71,8 +72,10 @@ class Correlation:
                 else:
                     mask = np.ones(corr_block.shape, dtype=bool)
 
-                if threshold is not None:
-                    mask = mask & (np.abs(corr_block) > threshold)
+                if pos_thresh is not None or neg_thresh is not None:
+                    pos_mask = (corr_block > pos_thresh) if pos_thresh is not None else np.zeros_like(mask, dtype=bool)
+                    neg_mask = (corr_block < neg_thresh) if neg_thresh is not None else np.zeros_like(mask, dtype=bool)
+                    mask = mask & (pos_mask | neg_mask)
 
                 rows, cols = np.where(mask)
                 
