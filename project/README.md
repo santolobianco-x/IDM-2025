@@ -100,7 +100,7 @@ Durante la stesura del codice si è seguito un approccio di **programmazione ori
 
 
 
-### 9 artifactchecker.py (Nuovo)
+### 9 artifactchecker.py 
 
 * **Classe:** `ArtifactChecker`
 * **Scopo:** Validazione dei risultati ridotti confrontandoli con i dati originali.
