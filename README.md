@@ -1,4 +1,4 @@
-#Introduzione al Data Mining 2025
+# Introduzione al Data Mining 2025
 
 La cartella contiene i materiali sviluppati durante il corso, organizzati in:
 
@@ -10,7 +10,7 @@ Tutti i lavori seguono un approccio **object-oriented**, con `main` come orchest
 
 ---
 
-##First Classwork – Market Basket Analysis
+## First Classwork – Market Basket Analysis
 
 **Dataset:** AnonymizedFidelity (transazioni di un supermercato)
 
@@ -26,7 +26,7 @@ Tutti i lavori seguono un approccio **object-oriented**, con `main` come orchest
 
 ---
 
-##Second Classwork – Classificazione clinica
+## Second Classwork – Classificazione clinica
 
 **Dataset:** DAES (fogli ASD, GDD, Controlli)
 
@@ -46,7 +46,7 @@ Tutti i lavori seguono un approccio **object-oriented**, con `main` come orchest
 
 ---
 
-##Progetto – Correlazioni geniche con Autoencoder e PCA
+## Progetto – Correlazioni geniche con Autoencoder e PCA
 
 **Dataset:** TCGA RNA-Seq (diversi tumori)
 
