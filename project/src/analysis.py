@@ -13,7 +13,7 @@ class CorrelationAnalyzer:
         self.dataset = dataset
         self.epsilon = epsilon
 
-        print(f"[{self.tumor}] Indicizzazione coppie di geni in corso...")
+        print(f"[{self.tumor}] Indexing gene pairs...")
 
         self.corr = self._prepare_df(corr)
         self.corr_ae = self._prepare_df(corr_ae)
@@ -48,7 +48,7 @@ class CorrelationAnalyzer:
     
     def _analyze_method(self, df_target, method_name):
 
-        print(f"\n[Confronto RAW vs {method_name}]")
+        print(f"\nRAW vs {method_name} comparison")
 
         idx_raw = self.corr.index
         idx_target = df_target.index
@@ -64,7 +64,7 @@ class CorrelationAnalyzer:
         aligned = df_target.reindex(idx_raw).dropna()
 
         if aligned.empty:
-            print("Nessuna coppia in comune.")
+            print("No common gene pairs.")
             return
 
         x = self.corr.loc[aligned.index, 'Correlation'].to_numpy()
@@ -78,9 +78,9 @@ class CorrelationAnalyzer:
         else:
             sp = self._fast_spearman(x, y)
 
-        print(f"  -> RMSE: {rmse:.4f}")
-        print(f"  -> Spearman: {sp:.4f}")
-        print(f"  -> Coppie analizzate: {len(x)}")
+        print(f"RMSE: {rmse:.4f}")
+        print(f"Spearman: {sp:.4f}")
+        print(f"Pairs analyzed: {len(x)}")
 
         del aligned, x, y
         gc.collect()
@@ -108,7 +108,7 @@ class CorrelationAnalyzer:
                         label='PCA', fill=True, alpha=0.2)
 
         plt.xlim(-1, 1)
-        plt.title(f"Distribuzione Correlazioni - {self.tumor}")
+        plt.title(f"Corrrelation Distribution - {self.tumor}")
         plt.legend()
         plt.grid(alpha=0.3)
         plt.show()
@@ -144,7 +144,7 @@ class CorrelationAnalyzer:
         if self.artifact_pca is not None:
             self._scatter_panel(axes[0, idx], self.artifact_pca, "PCA", "forestgreen")
 
-        plt.suptitle(f"Analisi Artefatti: {self.tumor}", fontsize=14)
+        plt.suptitle(f"Artifact Analysis: {self.tumor}", fontsize=14)
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.show()
 
@@ -174,7 +174,7 @@ class CorrelationAnalyzer:
         ax.plot([-1, 1], [-1, 1], 'r--', alpha=0.5)
         ax.set_xlim(-1, 1)
         ax.set_ylim(-1, 1)
-        ax.set_title(f"RAW vs {label}\nArtefatti: {art_pct:.2f}%")
+        ax.set_title(f"RAW vs {label}\nArtifacts: {art_pct:.2f}%")
         ax.grid(alpha=0.2)
 
 
@@ -220,5 +220,5 @@ class CorrelationAnalyzer:
 
         self._plot_scatter()
 
-        print(f"\n--- Analisi completata per {self.tumor} ---\n")
+        print(f"\n--- Analysis completed for {self.tumor} ---\n")
         gc.collect()

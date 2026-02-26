@@ -34,7 +34,7 @@ class ArtifactChecker:
         idx_b = idx_b[valid]
 
         n_pairs = len(df)
-        batch_size = 200_000
+        batch_size = 200000
         corr_orig = np.empty(n_pairs, dtype=np.float32)
 
         for start in range(0, n_pairs, batch_size):
@@ -62,5 +62,5 @@ class ArtifactChecker:
         total = len(df)
         artifacts = int(df["Artifact"].sum())
         print(f"\n[{self.name}] Artifact Summary:")
-        print(f"  Total pairs: {total}")
-        print(f"  Artifacts:   {artifacts} ({100*artifacts/total:.2f}%)")
+        print(f"Total pairs: {total}")
+        print(f"Artifacts:   {artifacts} ({100*artifacts/total:.2f}%)")
